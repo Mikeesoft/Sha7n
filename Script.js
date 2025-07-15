@@ -40,3 +40,34 @@ document.getElementById("confirm-btn").addEventListener("click", () => {
   const url = `payment.html?game=${encodeURIComponent(game)}&pack=${pack}&playerId=${playerId}`;
   window.location.href = url;
 });
+function renderNotifications() {
+  const notifBox = document.getElementById("notificationsList");
+  const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+
+  if (!notifBox) return;
+
+  if (orders.length === 0) {
+    notifBox.innerHTML = "<p style='color:#888;'>لا توجد إشعارات حالياً.</p>";
+    return;
+  }
+
+  notifBox.innerHTML = "";
+  const latest = orders.slice(-5).reverse(); // عرض آخر 5 إشعارات
+
+  latest.forEach(order => {
+    const div = document.createElement("div");
+    div.className = "notif-item";
+    div.innerHTML = `
+      🎮 <strong>${order.game}</strong> – ${order.pack} UC<br>
+      🆔 ${order.playerId}<br>
+      🧾 ${order.trackCode}<br>
+      🔄 ${order.status}
+    `;
+    notifBox.appendChild(div);
+  });
+
+  // تظهر النقطة الحمراء
+  document.getElementById("notifDot").style.display = "block";
+}
+
+renderNotifications();

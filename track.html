@@ -61,8 +61,9 @@
       padding: 15px;
       background-color: #f1f1f1;
       border-radius: 8px;
-      font-size: 17px;
+      font-size: 16px;
       color: #444;
+      text-align: right;
     }
   </style>
 </head>
@@ -76,16 +77,27 @@
   </div>
 
   <script>
-    const fakeDB = {
-      "123456": "⏳ جاري تنفيذ الطلب",
-      "654321": "✅ تم تنفيذ الطلب",
-      "000111": "❌ تم رفض الطلب"
-    };
-
     function checkStatus() {
       const id = document.getElementById("trackId").value.trim();
-      const result = fakeDB[id] || "🚫 لم يتم العثور على هذا الطلب";
-      document.getElementById("result").innerText = result;
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const order = orders.find(o => o.trackCode === id);
+
+      const resultBox = document.getElementById("result");
+
+      if (!order) {
+        resultBox.innerHTML = "🚫 لم يتم العثور على هذا الطلب.";
+        return;
+      }
+
+      resultBox.innerHTML = `
+        🧾 <strong>كود التتبع:</strong> ${order.trackCode}<br>
+        🎮 <strong>اللعبة:</strong> ${order.game}<br>
+        📦 <strong>الباقة:</strong> ${order.pack} UC<br>
+        🆔 <strong>ID اللاعب:</strong> ${order.playerId}<br>
+        💳 <strong>الدفع:</strong> ${order.method}<br>
+        💰 <strong>السعر:</strong> ${order.price} جنيه<br>
+        🔄 <strong>الحالة:</strong> ${order.status}
+      `;
     }
   </script>
 </body>

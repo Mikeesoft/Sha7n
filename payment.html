@@ -129,7 +129,19 @@
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        // عرض كود التتبع للعميل
+        // حفظ الطلب محليًا في LocalStorage
+        let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+        orders.push({
+          trackCode,
+          game,
+          pack,
+          price,
+          playerId,
+          method,
+          status: "⏳ جاري تنفيذ الطلب"
+        });
+        localStorage.setItem("orders", JSON.stringify(orders));
+
         alert(`✅ تم إرسال الطلب بنجاح!\n🧾 كود تتبعك: ${trackCode}`);
         window.location.href = "index.html";
       })
