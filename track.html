@@ -76,43 +76,40 @@
     <div id="result" class="result"></div>
   </div>
 
-  <!-- Firebase CDN -->
-  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js"></script>
+  <!-- Firebase + Firestore -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-  <script>
-    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyA0zhseWV-ntjk1GIZEd85JgC8_6MHGq2k",
-      authDomain: "sha7n-83578.firebaseapp.com",
-      projectId: "sha7n-83578"
+      projectId: "sha7n-83578",
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    // وظيفة التتبع
     async function checkStatus() {
       const id = document.getElementById("trackId").value.trim();
       const resultBox = document.getElementById("result");
 
-      if (!id) {
-        resultBox.innerHTML = "⚠️ من فضلك أدخل كود التتبع.";
+      if (id === "") {
+        resultBox.innerHTML = "🚫 من فضلك أدخل كود التتبع.";
         return;
       }
 
-      try {
-        const docRef = await db.collection("orders").doc(id).get();
+      const q = query(collection(db, "orders"), where("trackCode", "==", id));
+      const snapshot = await getDocs(q);
 
-        if (!docRef.exists) {
-          resultBox.innerHTML = "🚫 لم يتم العثور على هذا الطلب.";
-          return;
-        }
+      if (snapshot.empty) {
+        resultBox.innerHTML = "🚫 لم يتم العثور على هذا الطلب.";
+        return;
+      }
 
-        const order = docRef.data();
-
+      snapshot.forEach(doc => {
+        const order = doc.data();
         resultBox.innerHTML = `
-          🧾 <strong>كود التتبع:</strong> ${id}<br>
+          🧾 <strong>كود التتبع:</strong> ${order.trackCode}<br>
           🎮 <strong>اللعبة:</strong> ${order.game}<br>
           📦 <strong>الباقة:</strong> ${order.pack} UC<br>
           🆔 <strong>ID اللاعب:</strong> ${order.playerId}<br>
@@ -120,11 +117,10 @@
           💰 <strong>السعر:</strong> ${order.price} جنيه<br>
           🔄 <strong>الحالة:</strong> ${order.status}
         `;
-      } catch (err) {
-        console.error(err);
-        resultBox.innerHTML = "❌ حدث خطأ أثناء التتبع.";
-      }
+      });
     }
+
+    window.checkStatus = checkStatus;
   </script>
 </body>
 </html>
