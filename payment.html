@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تأكيد الدفع</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f9f9f9;
+      padding: 30px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 25px;
+      text-align: right;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      margin: 15px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #777;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="title">جاري تجهيز طلبك...</h2>
+
+    <div class="info" id="details">
+      <!-- يتم تعبئتها تلقائيًا -->
+    </div>
+
+    <label for="txn">رقم العملية بعد التحويل:</label>
+    <input type="text" id="txn" placeholder="اكتب رقم العملية هنا" />
+
+    <button onclick="submitPayment()">تأكيد الدفع</button>
+
+    <div class="note">سيتم مراجعة العملية خلال دقائق قليلة.</div>
+  </div>
+
+<script>
+  // التقاط البيانات من الرابط
+  const urlParams = new URLSearchParams(window.location.search);
+  const game = urlParams.get("game") || "غير محدد";
+  const pack = urlParams.get("pack") || "غير محدد";
+  const playerId = urlParams.get("playerId") || "غير محدد";
+  const method = "فودافون كاش";
+  const price = getPrice(pack);
+
+  // عرض البيانات في الصفحة
+  document.getElementById("title").innerText = `✅ جاري تجهيز طلبك لشحن ${game} – ${pack} UC`;
+
+  document.getElementById("details").innerHTML = `
+    🆔 ID اللاعب: <strong>${playerId}</strong><br>
+    💰 المبلغ المطلوب: <strong>${price} جنيه</strong><br>
+    📲 برجاء تحويل المبلغ إلى:<br>
+    <strong>01029527600</strong> (فودافون كاش)
+  `;
+
+  function getPrice(pack) {
+    switch (pack) {
+      case "10": return 6;
+      case "30": return 18;
+      case "60": return 35;
+      default: return "؟";
+    }
+  }
+
+  function submitPayment() {
+    const txnId = document.getElementById("txn").value.trim();
+    if (txnId === "") {
+      alert("من فضلك أدخل رقم العملية.");
+      return;
+    }
+
+    // توليد كود تتبع فريد
+    const trackCode = "TRK" + Math.floor(Math.random() * 1000000);
+
+    const botToken = "8043918635:AAH9FylLNHmbeESOL5w3exilErORvJh9VpU";
+    const chatId = "7277765106";
+
+    const message = `🕹️ طلب شحن جديد:\n\n🎮 اللعبة: ${game}\n📦 الباقة: ${pack} UC\n💰 السعر: ${price} جنيه\n🆔 ID اللاعب: ${playerId}\n💳 وسيلة الدفع: ${method}\n🔁 رقم العملية: ${txnId}\n\n🧾 كود التتبع: ${trackCode}`;
+
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        // عرض كود التتبع للعميل
+        alert(`✅ تم إرسال الطلب بنجاح!\n🧾 كود تتبعك: ${trackCode}`);
+        window.location.href = "index.html";
+      })
+      .catch(err => {
+        alert("❌ حصل خطأ أثناء إرسال الطلب.");
+        console.error(err);
+      });
+  }
+</script>
+</body>
+</html>

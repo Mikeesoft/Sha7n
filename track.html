@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تتبع الطلب</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background-color: #f3f3f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .track-box {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f1f1f1;
+      border-radius: 8px;
+      font-size: 17px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="track-box">
+    <h2>تتبع طلبك</h2>
+    <input type="text" id="trackId" placeholder="ادخل كود التتبع هنا">
+    <button onclick="checkStatus()">تتبع الآن</button>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    const fakeDB = {
+      "123456": "⏳ جاري تنفيذ الطلب",
+      "654321": "✅ تم تنفيذ الطلب",
+      "000111": "❌ تم رفض الطلب"
+    };
+
+    function checkStatus() {
+      const id = document.getElementById("trackId").value.trim();
+      const result = fakeDB[id] || "🚫 لم يتم العثور على هذا الطلب";
+      document.getElementById("result").innerText = result;
+    }
+  </script>
+</body>
+</html>
