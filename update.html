@@ -2,135 +2,94 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>تأكيد الدفع</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تحديث حالة الطلب</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background-color: #f9f9f9;
-      padding: 30px;
-      color: #333;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    .container {
-      max-width: 400px;
-      margin: auto;
+    .box {
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 25px;
-      text-align: right;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
     }
 
-    h2 {
+    .status {
       font-size: 20px;
       margin-bottom: 15px;
     }
 
-    .info {
-      margin: 15px 0;
-      font-size: 16px;
-      line-height: 1.6;
+    .success {
+      color: green;
     }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
+    .error {
+      color: red;
     }
 
-    button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 20px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
-    }
-
-    .note {
-      font-size: 14px;
-      color: #777;
+    a {
+      display: inline-block;
       margin-top: 15px;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2 id="title">جاري تجهيز طلبك...</h2>
-    <div class="info" id="details"></div>
-
-    <label for="txn">رقم العملية بعد التحويل:</label>
-    <input type="text" id="txn" placeholder="اكتب رقم العملية هنا" />
-
-    <button onclick="submitPayment()">تأكيد الدفع</button>
-
-    <div class="note">سيتم مراجعة العملية خلال دقائق قليلة.</div>
+  <div class="box">
+    <div id="statusMsg" class="status"></div>
+    <a href="index.html">🔙 الرجوع إلى الرئيسية</a>
   </div>
 
-<script>
-  // التقاط البيانات من الرابط
-  const urlParams = new URLSearchParams(window.location.search);
-  const game = urlParams.get("game") || "غير محدد";
-  const pack = urlParams.get("pack") || "غير محدد";
-  const playerId = urlParams.get("playerId") || "غير محدد";
-  const method = "فودافون كاش";
-  const price = getPrice(pack);
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    const status = urlParams.get("status");
 
-  document.getElementById("title").innerText = `✅ جاري تجهيز طلبك لشحن ${game} – ${pack} UC`;
-  document.getElementById("details").innerHTML = `
-    🆔 ID اللاعب: <strong>${playerId}</strong><br>
-    💰 المبلغ المطلوب: <strong>${price} جنيه</strong><br>
-    📲 برجاء تحويل المبلغ إلى:<br>
-    <strong>01029527600</strong> (فودافون كاش)
-  `;
+    const statusBox = document.getElementById("statusMsg");
 
-  function getPrice(pack) {
-    switch (pack) {
-      case "10": return 6;
-      case "30": return 18;
-      case "60": return 35;
-      default: return "؟";
+    if (!code || !status) {
+      statusBox.innerText = "❌ بيانات غير صالحة.";
+      statusBox.classList.add("error");
+    } else {
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const index = orders.findIndex(order => order.trackCode === code);
+
+      if (index === -1) {
+        statusBox.innerText = "🚫 لم يتم العثور على الطلب.";
+        statusBox.classList.add("error");
+      } else {
+        let statusText = "";
+        if (status === "done") {
+          statusText = "✅ تم تنفيذ الطلب بنجاح.";
+          orders[index].status = "✅ تم التنفيذ";
+        } else if (status === "rejected") {
+          statusText = "❌ تم رفض الطلب.";
+          orders[index].status = "❌ مرفوض";
+        } else {
+          statusText = "⚠️ حالة غير معروفة.";
+          statusBox.classList.add("error");
+        }
+
+        localStorage.setItem("orders", JSON.stringify(orders));
+        statusBox.innerText = statusText;
+        statusBox.classList.add("success");
+      }
     }
-  }
-
-  function submitPayment() {
-    const txnId = document.getElementById("txn").value.trim();
-    if (txnId === "") {
-      alert("من فضلك أدخل رقم العملية.");
-      return;
-    }
-
-    const trackCode = "TRK" + Math.floor(Math.random() * 1000000);
-
-    // حفظ الطلب في localStorage فقط
-    const newOrder = {
-      game,
-      pack,
-      playerId,
-      trackCode,
-      txnId,
-      method,
-      status: "⏳ جاري التنفيذ"
-    };
-
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    orders.push(newOrder);
-    localStorage.setItem("orders", JSON.stringify(orders));
-
-    alert(`✅ تم تسجيل طلبك بنجاح!\n🧾 كود تتبعك: ${trackCode}`);
-    window.location.href = "index.html";
-  }
-</script>
+  </script>
 </body>
 </html>
