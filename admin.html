@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم - المشرف</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.done {
+  background-color: #28a745;
+  color: white;
+}
+
+.rejected {
+  background-color: #dc3545;
+  color: white;
+}
+
+  </style>
+</head>
+<body>
+  <h1>لوحة تحكم الطلبات</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>اللعبة</th>
+        <th>الباقة</th>
+        <th>ID اللاعب</th>
+        <th>الكود</th>
+        <th>الحالة</th>
+        <th>إجراء</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTable"></tbody>
+  </table>  <script>
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const tableBody = document.getElementById("ordersTable");
+
+    function renderOrders() {
+      tableBody.innerHTML = "";
+      orders.forEach((order, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${order.game}</td>
+          <td>${order.pack}</td>
+          <td>${order.playerId}</td>
+          <td>${order.trackCode}</td>
+          <td id="status-${index}">${order.status}</td>
+          <td>
+            <button class="done" onclick="updateStatus(${index}, '✅ تم التنفيذ')">تم</button>
+            <button class="rejected" onclick="updateStatus(${index}, '❌ مرفوض')">رفض</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function updateStatus(index, newStatus) {
+      orders[index].status = newStatus;
+      localStorage.setItem("orders", JSON.stringify(orders));
+      document.getElementById("status-" + index).textContent = newStatus;
+    }
+
+    renderOrders();
+  </script></body>
+</html>
