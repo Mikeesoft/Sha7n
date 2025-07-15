@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <title>تتبع الطلب</title>
@@ -14,86 +13,86 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-    }
+    }.track-box {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
 
-    .track-box {
-      background-color: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-    }
+h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
 
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
-    }
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
 
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 15px;
-    }
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+button:hover {
+  background-color: #0056b3;
+}
 
-    button:hover {
-      background-color: #0056b3;
-    }
+.result {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #444;
+  text-align: right;
+}
 
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f1f1f1;
-      border-radius: 8px;
-      font-size: 16px;
-      color: #444;
-      text-align: right;
-    }
   </style>
 </head>
 <body>
-
   <div class="track-box">
     <h2>تتبع طلبك</h2>
     <input type="text" id="trackId" placeholder="ادخل كود التتبع هنا">
     <button onclick="checkStatus()">تتبع الآن</button>
     <div id="result" class="result"></div>
-  </div>
-
-  <!-- Firebase + Firestore -->
-  <script type="module">
+  </div>  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA0zhseWV-ntjk1GIZEd85JgC8_6MHGq2k",
+      authDomain: "sha7n-83578.firebaseapp.com",
       projectId: "sha7n-83578",
+      storageBucket: "sha7n-83578.appspot.com",
+      messagingSenderId: "468992833900",
+      appId: "1:468992833900:web:1aeac45a6b4438467e5b49",
+      measurementId: "G-EBMZ37R5HC"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function checkStatus() {
+    window.checkStatus = async function() {
       const id = document.getElementById("trackId").value.trim();
       const resultBox = document.getElementById("result");
 
-      if (id === "") {
+      if (!id) {
         resultBox.innerHTML = "🚫 من فضلك أدخل كود التتبع.";
         return;
       }
@@ -107,20 +106,17 @@
       }
 
       snapshot.forEach(doc => {
-        const order = doc.data();
+        const data = doc.data();
         resultBox.innerHTML = `
-          🧾 <strong>كود التتبع:</strong> ${order.trackCode}<br>
-          🎮 <strong>اللعبة:</strong> ${order.game}<br>
-          📦 <strong>الباقة:</strong> ${order.pack} UC<br>
-          🆔 <strong>ID اللاعب:</strong> ${order.playerId}<br>
-          💳 <strong>الدفع:</strong> ${order.method}<br>
-          💰 <strong>السعر:</strong> ${order.price} جنيه<br>
-          🔄 <strong>الحالة:</strong> ${order.status}
+          🧾 <strong>كود التتبع:</strong> ${data.trackCode}<br>
+          🎮 <strong>اللعبة:</strong> ${data.game}<br>
+          📦 <strong>الباقة:</strong> ${data.pack} UC<br>
+          🆔 <strong>ID اللاعب:</strong> ${data.playerId}<br>
+          💳 <strong>الدفع:</strong> ${data.method}<br>
+          💰 <strong>السعر:</strong> ${data.price} جنيه<br>
+          🔄 <strong>الحالة:</strong> ${data.status}
         `;
       });
     }
-
-    window.checkStatus = checkStatus;
-  </script>
-</body>
+  </script></body>
 </html>
